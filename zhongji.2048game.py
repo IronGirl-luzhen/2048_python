@@ -13,6 +13,7 @@ class Box:
     def getRectangle(self):
         return self.f
     def getText(self):
+        print("haha")
         return self.t
     
 class Game:
