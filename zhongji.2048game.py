@@ -14,6 +14,7 @@ class Box:
         return self.f
     def getText(self):
         print("haha")
+        print "wer"
         return self.t
     
 class Game:
