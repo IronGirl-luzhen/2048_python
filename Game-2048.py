@@ -65,7 +65,7 @@ class Game:
             line2 = Line(Point(tt,0.5),Point(tt,4.5)).draw(win)
             tt+=1
         blist=[[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]]
-        clist={0:"lightblue",2:"yellow",4:"orange",8:"grey",16:"light green",32:"light yellow",64:"brown",128:"purple",256:"green",512:"light red",1024:"red",2048:"black"}
+        clist={0:"lightblue",2:"yellow",4:"orange",8:"grey",16:"light green",32:"light yellow",64:"brown",128:"purple",256:"green",512:"sapphire",1024:"red",2048:"black"}
         self.w = win
         self.a = a
         self.c = clist
@@ -234,7 +234,7 @@ class Game:
             self.w.getMouse()
             c.undraw()
             b.undraw()
-            return 1
+            return 2
         for i in range(4):
             for j in range(4):
                 if self.b[i][j] == 2048:
@@ -246,12 +246,19 @@ class Game:
                     q = self.w.getMouse()
                     r.undraw()
                     tt.undraw()
-                    return 0
-        return 2            
+                    return 2            
                 
     def quit_step(self):
         self.w.close()
         
+    def new_button1(self):
+        self.ww = GraphWin("Ask_graph",500,200)
+        self.ww.setCoords(0,0,6,2)
+        self.restartButton = Button(self.ww,Point(2,1),1,0.5,"restart")
+        self.quitButton = Button(self.ww,Point(4,1),1,0.5,"quit")
+        self.restartButton.activate()
+        self.quitButton.activate()
+
     def step_restart(self):
         for i in range(4):
             for j in range(4):
@@ -357,10 +364,18 @@ class Game:
             
             result = self.over_step()
             if result == 2:
-                continue
-            else:
-                self.quit_step()
-                break
+                self.new_button1()
+                g = self.ww.getMouse()
+                if self.quitButton.clicked(g):
+                    self.ww.close()
+                    self.w.close()
+                    break
+                if self.restartButton.clicked(g):
+                    self.ww.close()
+                    self.step_restart()
+                else:
+                    continue
+            
             
 def main():
     Ga = Game()
