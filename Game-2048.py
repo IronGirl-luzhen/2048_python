@@ -1,7 +1,7 @@
 from button import*
 import random
 import copy
-class Box:
+class Box:#attach number to rectangle by using class
     def __init__(self,xVal,yVal,color,n):
         self.x = xVal
         self.y = yVal
@@ -10,6 +10,7 @@ class Box:
         self.f =Rectangle(Point(self.x-0.5,self.y-0.5),Point(self.x+0.5,self.y+0.5))
         self.f.setFill(self.c)
         self.t = Text(Point(self.x,self.y),self.n)
+        self.t.setSize(30)
         
     def getRectangle(self):
         return self.f
@@ -18,6 +19,7 @@ class Box:
         return self.t
     
 class Game:
+    #draw Rrctangle,and number
     def setBox(self,i,j,color,n):
         self.boxList[i][j].getRectangle().setFill(color)
         if self.b[i][j] == 0:
@@ -33,7 +35,7 @@ class Game:
         self.boxList[i][j].getRectangle().undraw()
         self.boxList[i][j].getText().undraw()
         
-    def __init__(self):
+    def __init__(self):# design the windows
         win = GraphWin("Jane`s 2048",700,700)
         win.setCoords(0.0,0.0,7.0,7.0)
         win.setBackground("light blue")
@@ -64,15 +66,17 @@ class Game:
             line1 = Line(Point(0.5,tt),Point(4.5,tt)).draw(win)
             line2 = Line(Point(tt,0.5),Point(tt,4.5)).draw(win)
             tt+=1
-        blist=[[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]]
-        clist={0:"lightblue",2:"yellow",4:"orange",8:"grey",16:"light green",32:"light yellow",64:"brown",128:"purple",256:"green",512:"sapphire",1024:"red",2048:"black"}
-        self.w = win
-        self.a = a
-        self.c = clist
-        self.b = blist
-        self.s = score
-        boxList = []
-        for i in range(4):
+        blist=[[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]]# attach number to blist
+        cdict={0:"light blue",2:color_rgb(255,255,128),4:color_rgb(255,128,255),8:color_rgb(255,128,128),\
+               16:color_rgb(0,255,64),32:color_rgb(128,128,64),64:color_rgb(255,0,128),128:color_rgb(128,0,64)\
+               ,256:color_rgb(64,0,128),512:color_rgb(255,0,0),1024:color_rgb(128,64,0),2048:color_rgb(128,0,0)}
+        self.w = win # the windows
+        self.a = a   # draw score
+        self.c = cdict # a dictionary contain number and color
+        self.b = blist #a list for move and draw
+        self.s = score # score
+        boxList = [] 
+        for i in range(4):#draw background
             tmpList = []
             for j in range(4):
                 box = Box(i+1,j+1,self.c[0],"")
@@ -80,7 +84,7 @@ class Game:
             boxList.append(tmpList)
         self.boxList = boxList
         
-    def step_first(self):
+    def step_first(self):# draw a random number after a click
         num=random.choice((2,2,2,2,4))
         color = "lightblue"
         while 1:
@@ -100,7 +104,7 @@ class Game:
         self.undrawBox(x-1, y-1)
         self.drawBox(x-1,y-1)
         self.b[x-1][y-1] = num
-        
+     # move operation   
     def up_move(self):
         for k in range(3):
             for i in range(3,-1,-1):
@@ -139,7 +143,7 @@ class Game:
             pos1 , t= self.merge(lst)
             for k in range(4):
                 self.b[i][k] = pos1[k]
-        
+     #recursive algorithm   
     def merge(self,lst):
         if len(lst) == 2:
             a = 0
@@ -200,18 +204,21 @@ class Game:
             pos1 , t= self.merge(lst)
             for k in range(4):
                 self.b[k][i] = pos1[k]
-                        
+    #draw all numbers after a click                  
     def step_third(self):
         for i in range(4):
             for j in range(4):
                 self.setBox(i,j,self.c[self.b[i][j]],self.b[i][j])
                 self.undrawBox(i, j)
                 self.drawBox(i, j)
-                        
+                
+    #record user's score           
     def step_score(self):
         self.a.undraw()
         self.a = Text(Point(2,5),str(self.s))
         self.a.draw(self.w)
+
+    # Game Over or Win
     def over_step(self):
         count1 = 0
         for i in range(4):
@@ -226,38 +233,45 @@ class Game:
                 if self.b[j+1][i] == self.b[j][i]:
                     count2 += 1
         if count1 == 16 and count2 ==0:
-            c = Rectangle(Point(2,2),Point(6,6))
-            c.setFill("red")
-            c.draw(self.w)
             b = Text(Point (4,4),"Game Over!!!")
+            b.setSize(30)
+            b.setTextColor("red")
             b.draw(self.w)
             self.w.getMouse()
-            c.undraw()
             b.undraw()
-            return 2
+            return 1
         for i in range(4):
             for j in range(4):
                 if self.b[i][j] == 2048:
-                    r = Rectangle(Point(2,2),Point(6,6))
-                    r.setFill("red")
-                    r.draw(self.w)
                     tt = Text(Point (4,4),"Congratulation!!!You win !!!")
+                    tt.setSize(30)
+                    tt.setTextColor("red")
                     tt.draw(self.w)
                     q = self.w.getMouse()
-                    r.undraw()
                     tt.undraw()
-                    return 2            
+                    return 2           
                 
     def quit_step(self):
         self.w.close()
-        
+
+    # A new windows will arise after you win or game over  
     def new_button1(self):
-        self.ww = GraphWin("Ask_graph",500,200)
-        self.ww.setCoords(0,0,6,2)
-        self.restartButton = Button(self.ww,Point(2,1),1,0.5,"restart")
-        self.quitButton = Button(self.ww,Point(4,1),1,0.5,"quit")
-        self.restartButton.activate()
-        self.quitButton.activate()
+        self.ww = GraphWin("Ask_graph",400,400)
+        self.ww.setCoords(0,0,4,4)
+        Image(Point(2,2),"back4.gif").draw(self.ww)
+        self.restartButton1 = Button(self.ww,Point(1,1),1,0.5,"restart")
+        self.quitButton1 = Button(self.ww,Point(3,1),1,0.5,"quit")
+        self.restartButton1.activate()
+        self.quitButton1.activate()
+        
+    def new_button2(self):
+        self.www = GraphWin("Ask_graph",400,400)
+        self.www.setCoords(0,0,4,4)
+        Image(Point(2,2),"back5.gif").draw(self.www)
+        self.restartButton2 = Button(self.www,Point(1,1),1,0.5,"restart")
+        self.quitButton2 = Button(self.www,Point(3,1),1,0.5,"quit")
+        self.restartButton2.activate()
+        self.quitButton2.activate()
 
     def step_restart(self):
         for i in range(4):
@@ -280,6 +294,7 @@ class Game:
         self.a = Text(Point(2,5),"0")
         self.a.draw(self.w)
 
+     # record the best score by using file operation
     def best_score(self):
         ff = open("grade.txt", "r")
         bb = ff.readline()
@@ -296,6 +311,7 @@ class Game:
             ff.write(str(self.s))
             ff.close()
 
+     #record the highest number
     def change_highest_num(self):
         li = []
         for item in self.b:
@@ -313,10 +329,7 @@ class Game:
     def draw_highest_num(self):
         self.h_num.undraw()
         self.h_num = Text(Point(2,6),self.hst)
-        self.h_num.draw(self.w)
-                
-                
-            
+        self.h_num.draw(self.w)        
         
     def start(self):
         pos=[]
@@ -332,7 +345,7 @@ class Game:
         while True:
             q = self.w.getMouse()
             self.restart.activate()
-            lst1 = copy.deepcopy(self.b)
+            self.lst1 = copy.deepcopy(self.b)
             if self.qButton.clicked(q):
                 self.quit_step()
                 break
@@ -346,10 +359,9 @@ class Game:
                 self.di_down()
             lst2 = copy.deepcopy(self.b)
             if self.left.clicked(q)or self.right.clicked(q)or self.up.clicked(q)or self.down.clicked(q):
-                if lst1 != lst2:
+                if self.lst1 != lst2:
                     self.step_first()
             self.step_score()
-            #self.step_second()
             self.step_third()
             if self.restart.clicked(q):
                 self.step_restart()
@@ -361,17 +373,28 @@ class Game:
             self.change_highest_num()
             self.highest_num()
             self.draw_highest_num()
-            
             result = self.over_step()
-            if result == 2:
+            if result == 1:
                 self.new_button1()
                 g = self.ww.getMouse()
-                if self.quitButton.clicked(g):
+                if self.quitButton1.clicked(g):
                     self.ww.close()
                     self.w.close()
                     break
-                if self.restartButton.clicked(g):
+                if self.restartButton1.clicked(g):
                     self.ww.close()
+                    self.step_restart()
+                else:
+                    continue
+            elif result == 2:
+                self.new_button2()
+                g = self.www.getMouse()
+                if self.quitButton2.clicked(g):
+                    self.www.close()
+                    self.w.close()
+                    break
+                if self.restartButton2.clicked(g):
+                    self.www.close()
                     self.step_restart()
                 else:
                     continue
